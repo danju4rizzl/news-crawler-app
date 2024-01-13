@@ -6,11 +6,17 @@ const crawler = new CheerioCrawler({
   // handles the processing request
   async requestHandler({ $, request, enqueueLinks }) {
     const title = $('title').text()
-    console.log(`The title of "${request.url}" is: ${title}.`)
     // The default behavior of enqueueLinks is to stay on the same hostname,
     // so it does not require any parameters.
     // This will ensure the subdomain stays the same.
-    await enqueueLinks()
+    await enqueueLinks({
+      transformRequestFunction(request) {
+        // ignore all adverts links
+        if (request.url.endsWith('/advertise-with-us')) return false
+        return request
+      }
+    })
+    console.log(`The title of "${request.url}" is: ${title}.`)
   }
 })
 
