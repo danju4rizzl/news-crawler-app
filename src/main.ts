@@ -1,4 +1,4 @@
-import { PlaywrightCrawler } from 'crawlee'
+import { PlaywrightCrawler, Dataset } from 'crawlee'
 import { Page } from 'playwright'
 import { extractCategoryTexts } from './productsCrawlers.js'
 
@@ -58,7 +58,8 @@ const crawler = new PlaywrightCrawler({
         availableInStock: inStock
       }
 
-      console.log(results)
+      // console.log(results)
+      await Dataset.pushData(results) // Save the results into a table
     } else if (request.label === 'CATEGORY') {
       // We are now on a category page. We can use this to paginate through and enqueue all products,
       // as well as any subsequent pages we find
