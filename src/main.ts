@@ -1,23 +1,23 @@
-import { CheerioCrawler } from 'crawlee'
+import { PlaywrightCrawler } from 'crawlee'
+import { Page } from 'playwright'
+import { extractCategoryTexts } from './categoryExtractor.js'
 
-const crawler = new CheerioCrawler({
-  maxRequestsPerCrawl: 5,
+// Define the URL to start the crawl from
+const START_URL = 'https://warehouse-theme-metal.myshopify.com/collections/'
 
-  // handles the processing request
-  async requestHandler({ $, request, enqueueLinks }) {
-    const title = $('title').text()
-    // The default behavior of enqueueLinks is to stay on the same hostname,
-    // so it does not require any parameters.
-    // This will ensure the subdomain stays the same.
-    await enqueueLinks({
-      transformRequestFunction(request) {
-        // ignore all adverts links
-        if (request.url.endsWith('/advertise-with-us')) return false
-        return request
-      }
-    })
-    console.log(`The title of "${request.url}" is: ${title}.`)
-  }
+// Define the request handler function
+// This function is passed to the PlaywrightCrawler constructor and is called for each page visited during the crawl
+// The function receives an object containing the current page as an argument
+// The page is then passed to the extractCategoryTexts function, which extracts and logs the category texts from the page
+const requestHandler = async ({ page }: { page: Page }) => {
+  await extractCategoryTexts(page)
+}
+
+// Create a new instance of PlaywrightCrawler
+// Pass the request handler function to the constructor
+const crawler = new PlaywrightCrawler({
+  requestHandler
 })
 
-await crawler.run(['https://punchng.com/'])
+// Start the crawl from the START_URL
+await crawler.run([START_URL])
