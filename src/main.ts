@@ -16,13 +16,49 @@ const START_URL = 'https://warehouse-theme-metal.myshopify.com/collections/'
 // Create a new instance of PlaywrightCrawler
 // Pass the request handler function to the constructor
 const crawler = new PlaywrightCrawler({
-  /**
-   *! The requestHandler will now visit all the listings URL's and all the details URL's
-   */
   requestHandler: async ({ page, request, enqueueLinks }) => {
-    console.log(`Processing: ${request.url} Label is: 👉🏽 ${request.label}`)
+    console.log(`Processing: ${request.url}`)
     if (request.label === 'DETAIL') {
-      // We're not doing anything with the details yet.
+      const urlPart = request.url.split('/').slice(-1) // ['sennheiser-mke-440-professional-stereo-shotgun-microphone-mke-440']
+      const manufacturer = urlPart[0].split('-')[0] // 'sennheiser'
+
+      const title = await page.locator('.product-meta h1').textContent()
+      const sku = await page
+        .locator('span.product-meta__sku-number')
+        .textContent()
+
+      const priceElement = page
+        .locator('span.price')
+        .filter({
+          hasText: '$'
+        })
+        .first()
+
+      const currentPriceString = await priceElement.textContent()
+      const rawPrice = currentPriceString?.split('$')[1]
+      const price = Number(rawPrice?.split(',').join(''))
+      // const rawPrice = currentPriceString.split('$')[1]
+      // const price = Number(rawPrice.replaceAll(',', ''))
+
+      const inStockElement = page
+        .locator('span.product-form__inventory')
+        .filter({
+          hasText: 'In stock'
+        })
+        .first()
+
+      const inStock = (await inStockElement.count()) > 0
+
+      const results = {
+        url: request.url,
+        manufacturer,
+        title,
+        sku,
+        currentPrice: price,
+        availableInStock: inStock
+      }
+
+      console.log(results)
     } else if (request.label === 'CATEGORY') {
       // We are now on a category page. We can use this to paginate through and enqueue all products,
       // as well as any subsequent pages we find
@@ -51,7 +87,10 @@ const crawler = new PlaywrightCrawler({
         label: 'CATEGORY'
       })
     }
-  }
+  },
+
+  // Let's limit our crawls to make our tests shorter and safer.
+  maxRequestsPerCrawl: 50
 })
 
 // Start the crawl from the START_URL
