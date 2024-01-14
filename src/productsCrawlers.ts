@@ -14,3 +14,5 @@ export async function extractCategoryTexts(page: Page) {
     console.log(`CATEGORY_${idx + 1}: ${text}\n`)
   })
 }
+
+export async function processProductsCrawling(page: Page) {}
