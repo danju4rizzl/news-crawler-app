@@ -1,9 +1,33 @@
 # Getting started with Crawlee
 
-This example uses `PlaywrightCrawler` to recursively crawl https://crawlee.dev using the browser automation library [Playwright](https://playwright.dev).
+The application uses `crawlee`to handle the heavy-lifting of scraping websites. You can visit the docs at [Crawlee Docs](https://crawlee.dev/).
 
-You can find more examples and documentation at the following links:
+## Development
+After cloning the repo, you need to run the following command from the terminal in root directory of the project.
+```
+# installs all dependencies
+pnpm i (recommended)
 
-- [Step-by-step tutorial](https://crawlee.dev/docs/introduction) for Crawlee
-- `PlaywrightCrawler` [API documentation](https://crawlee.dev/api/playwright-crawler/class/PlaywrightCrawler)
-- Other [examples](https://crawlee.dev/docs/examples/playwright-crawler)
+# or
+npm i
+
+# yarn
+```
+
+After the dependencies are installed you can run the application in development mode.
+
+```
+# start the development server
+pnpm run start 
+
+# or
+npm run start
+
+# yarn start
+```
+
+Then entry point for the application is in the `main.ts` file. Feel free to make a change to the `requestHandler`.
+
+The `extractCategoryTexts` runs after the app gets to the `START_URL`. It's also asynchronous so you can `await` for it to finish running the task.
+
+
