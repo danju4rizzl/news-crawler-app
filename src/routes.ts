@@ -45,6 +45,7 @@ router.addHandler('DETAIL', async ({ request, page, log }) => {
 
   // log.debug(`Saving data: ${request.url}`)
   await Dataset.pushData(results)
+  await Dataset.exportToJSON('🤖-scraped-data-file') // it can also be: await Dataset.exportToCSV
 })
 
 router.addHandler('CATEGORY', async ({ page, enqueueLinks, request, log }) => {
