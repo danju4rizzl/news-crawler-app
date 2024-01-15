@@ -1,13 +1,11 @@
-import { createPlaywrightRouter, Dataset, KeyValueStore } from 'crawlee'
+import { createPlaywrightRouter, Dataset } from 'crawlee'
 
 // createPlaywrightRouter() is only a helper to get better
 // intellisense and typings. You can use Router.create() too.
 export const router = createPlaywrightRouter()
-const keyValueStore = await KeyValueStore.open()
 
 // This replaces the request.label === DETAIL branch of the if clause.
 router.addHandler('DETAIL', async ({ request, page }) => {
-  const allResults = []
   // log.debug(`Extracting data: ${request.url}`)
   const urlPart = request.url.split('/').slice(-1) // ['sennheiser-mke-440-professional-stereo-shotgun-microphone-mke-440']
   const manufacturer = urlPart[0].split('-')[0] // 'sennheiser'
