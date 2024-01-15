@@ -6,7 +6,7 @@ export const router = createPlaywrightRouter()
 
 // This replaces the request.label === DETAIL branch of the if clause.
 router.addHandler('DETAIL', async ({ request, page, log }) => {
-  log.debug(`Extracting data: ${request.url}`)
+  // log.debug(`Extracting data: ${request.url}`)
   const urlPart = request.url.split('/').slice(-1) // ['sennheiser-mke-440-professional-stereo-shotgun-microphone-mke-440']
   const manufacturer = urlPart[0].split('-')[0] // 'sennheiser'
 
@@ -43,12 +43,13 @@ router.addHandler('DETAIL', async ({ request, page, log }) => {
     availableInStock: inStock
   }
 
-  log.debug(`Saving data: ${request.url}`)
+  // log.debug(`Saving data: ${request.url}`)
   await Dataset.pushData(results)
 })
 
 router.addHandler('CATEGORY', async ({ page, enqueueLinks, request, log }) => {
-  log.debug(`Enqueueing pagination for: ${request.url}`)
+  // log.debug(`Enqueueing pagination for: ${request.url}`)
+
   // We are now on a category page. We can use this to paginate through and enqueue all products,
   // as well as any subsequent pages we find
 
@@ -71,7 +72,8 @@ router.addHandler('CATEGORY', async ({ page, enqueueLinks, request, log }) => {
 // This is a fallback route which will handle the start URL
 // as well as the LIST labeled URLs.
 router.addDefaultHandler(async ({ request, page, enqueueLinks, log }) => {
-  log.debug(`Enqueueing categories from page: ${request.url}`)
+  // log.debug(`Enqueueing categories from page: ${request.url}`)
+
   // This means we're on the start page, with no label.
   // On this page, we just want to enqueue all the category pages.
 
