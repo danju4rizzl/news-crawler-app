@@ -26,8 +26,5 @@ npm run start
 # yarn start
 ```
 
-Then entry point for the application is in the `main.ts` file. Feel free to make a change to the `requestHandler`.
-
-The `extractCategoryTexts` runs after the app gets to the `START_URL`. It's also asynchronous so you can `await` for it to finish running the task.
-
+Then entry point for the application is in the `main.ts` file. For now all  routes are in the `/src/routes.ts` directory
 
