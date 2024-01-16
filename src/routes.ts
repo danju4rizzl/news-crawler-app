@@ -45,12 +45,12 @@ router.addHandler('DETAIL', async ({ request, page }) => {
   const results = {
     url: request.url,
     title,
-    price,
     summary,
-    sku,
-    cities,
     category,
-    description
+    price,
+    description,
+    cities,
+    sku
   }
 
   await Dataset.pushData(results)
