@@ -1,86 +1,78 @@
 import { createPlaywrightRouter, Dataset } from 'crawlee'
 
-// createPlaywrightRouter() is only a helper to get better
-// intellisense and typings. You can use Router.create() too.
+
 export const router = createPlaywrightRouter()
 
-// This replaces the request.label === DETAIL branch of the if clause.
+// This route will run first WHEN a product detail page is visited.
 router.addHandler('DETAIL', async ({ request, page }) => {
-  // log.debug(`Extracting data: ${request.url}`)
-  const urlPart = request.url.split('/').slice(-1) // ['sennheiser-mke-440-professional-stereo-shotgun-microphone-mke-440']
-  const manufacturer = urlPart[0].split('-')[0] // 'sennheiser'
-
-  const title = await page.locator('.product-meta h1').textContent()
-  const sku = await page.locator('span.product-meta__sku-number').textContent()
-
+  const titleElement = page.locator('.detail-info h2.product-title')
+  const summaryElement = page.locator('.pd_summary p')
+  const cityElement = page.locator('.swatch label')
+  const categoryElement = page.locator('.product-category-info a')
+  const skuElement = page.locator('span.engoj-variant-sku')
+  const descriptionElement = page.locator('.tab-content .desc.product-desc')
   const priceElement = page
-    .locator('span.price')
+    .locator('.product-price .engoj_price_main')
     .filter({
-      hasText: '$'
+      hasText: 'R'
     })
     .first()
+
+  const title = await titleElement.textContent()
+  const summary = await summaryElement.textContent()
+
+  const cities = (await cityElement.allTextContents()).map(
+    (city) => city.trim() // fixes cities": [ "\n Cape Town\n ", "\n Johannesburg\n ",...]
+  )
+
+  const category = (await categoryElement.allTextContents()).map(
+    (cat) => cat.replace(',', '').trim() // fixes ["Asphalt and Bitumen Products, "...]
+  )
+
+  let sku = null // sets the default sku value
+  const skuExists = await skuElement.count()
+  if (skuExists) {
+    sku = await skuElement.textContent()
+  }
 
   const currentPriceString = await priceElement.textContent()
-  const rawPrice = currentPriceString?.split('$')[1]
-  // const price = Number(rawPrice.replaceAll(',', ''))
-  const price = Number(rawPrice?.split(',').join(''))
+  const transformedPrice =
+    currentPriceString?.replace('R', '').replace('ZAR', '') || ''
+  const price = Number(transformedPrice.replace(',', ''))
 
-  const inStockElement = page
-    .locator('span.product-form__inventory')
-    .filter({
-      hasText: 'In stock'
-    })
-    .first()
-
-  const inStock = (await inStockElement.count()) > 0
+  const description = await descriptionElement.innerHTML()
 
   const results = {
     url: request.url,
-    manufacturer,
     title,
+    price,
+    summary,
     sku,
-    currentPrice: price,
-    availableInStock: inStock
+    cities,
+    category,
+    description
   }
 
-  // log.debug(`Saving data: ${request.url}`)
   await Dataset.pushData(results)
-  await Dataset.exportToJSON('scraped-data-file') // it can also be: await Dataset.exportToCSV
+  await Dataset.exportToJSON('scraped-data-file')
 })
 
-router.addHandler('CATEGORY', async ({ page, enqueueLinks }) => {
-  // log.debug(`Enqueueing pagination for: ${request.url}`)
-
-  // We are now on a category page. We can use this to paginate through and enqueue all products,
-  // as well as any subsequent pages we find
-
-  await page.waitForSelector('.product-item > a')
-  await enqueueLinks({
-    selector: '.product-item > a',
-    label: 'DETAIL' // <= note the different label
-  })
-
-  // Now we need to find the "Next" button and enqueue the next page of results (if it exists)
-  const nextButton = await page.$('a.pagination__next')
-  if (nextButton) {
+// This route will run first WHEN a collection page is visited.
+router.addHandler('COLLECTION', async ({ page, enqueueLinks }) => {
+  const categoryButton = await page.waitForSelector('.title-product > a')
+  if (categoryButton) {
     await enqueueLinks({
-      selector: 'a.pagination__next',
-      label: 'CATEGORY' // <= note the same label
+      selector: '.title-product > a',
+      label: 'DETAIL'
     })
   }
 })
 
-// This is a fallback route which will handle the start URL
-// as well as the LIST labeled URLs.
+// This route will run first WHEN a default page is visited.
 router.addDefaultHandler(async ({ page, enqueueLinks }) => {
-  // log.debug(`Enqueueing categories from page: ${request.url}`)
-
-  // This means we're on the start page, with no label.
-  // On this page, we just want to enqueue all the category pages.
-
-  await page.waitForSelector('.collection-block-item')
+  await page.waitForSelector('.banner_title > a')
   await enqueueLinks({
-    selector: '.collection-block-item',
-    label: 'CATEGORY'
+    selector: '.banner_title > a',
+    label: 'COLLECTION'
   })
 })

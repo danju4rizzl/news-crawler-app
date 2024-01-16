@@ -5,7 +5,7 @@ import { router } from './routes.js'
 await Actor.init()
 
 // Define the URL to start the crawl from
-const START_URL = 'https://warehouse-theme-metal.myshopify.com/collections/'
+const START_URL = 'https://www.pavementmaterials.co.za/collections'
 
 const crawler = new PlaywrightCrawler({
   // use this is for debugging during development.
