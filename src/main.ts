@@ -1,11 +1,12 @@
 import { Actor } from 'apify'
 import { PlaywrightCrawler, log } from 'crawlee'
-import { router } from './routes.js'
+import { router } from './routes-woocommerce.js'
 
 await Actor.init()
 
 // Define the URL to start the crawl from
-const START_URL = 'https://www.pavementmaterials.co.za/collections'
+// const START_URL = 'https://www.pavementmaterials.co.za/collections'
+const START_URL = 'https://www.carrimonline.co.za/building/'
 
 const crawler = new PlaywrightCrawler({
   // use this is for debugging during development.
