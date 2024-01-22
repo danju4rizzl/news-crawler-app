@@ -1,4 +1,5 @@
 import { createPlaywrightRouter, Dataset } from 'crawlee'
+import { getAiDescription, getAiTitle } from './utils/helpers.js'
 
 export const router = createPlaywrightRouter()
 
@@ -6,6 +7,7 @@ export const router = createPlaywrightRouter()
 
 // This route will run first WHEN a collection page is visited.
 router.addHandler('COMPETITOR_CATEGORY', async ({ page, request }) => {
+  // Create element selectors here
   const titleElement = page.locator('.product-summary h1')
   const categoryElement = page.locator('.posted_in a')
   const priceElement = page.locator('p.price.product-page-price bdi')
@@ -13,17 +15,23 @@ router.addHandler('COMPETITOR_CATEGORY', async ({ page, request }) => {
     '.woocommerce-Tabs-panel--description'
   )
 
-  const title = (await titleElement.textContent())?.trim()
-  const description = await descriptionElement.innerHTML()
+  // formatting the title here
+  const rawTitle = await titleElement.textContent()
+  const rawDesc = await descriptionElement.innerHTML()
+
+  const description = await getAiDescription(rawDesc)
+  const title = await getAiTitle(rawTitle, rawDesc)
 
   const price = (await priceElement.allInnerTexts()).map((p) =>
     parseFloat(p.replace('R', '').replace(',', '').trim())
   )
 
+  // formatting the category here
   const category = (await categoryElement.allTextContents()).map((c) =>
     c.trim()
   )
 
+  // formatting the entire result
   const results = {
     url: request.url,
     title,
@@ -32,9 +40,10 @@ router.addHandler('COMPETITOR_CATEGORY', async ({ page, request }) => {
     category
   }
 
-  console.log(results)
-  // await Dataset.pushData(results)
-  // await Dataset.exportToJSON('competitor-data-file')
+  await Dataset.pushData(results)
+  console.log('saved: ', results)
+  await Dataset.exportToJSON('competitor-data-file')
+  await Dataset.exportToCSV('competitor-data-file')
 })
 
 // This route will run first WHEN a default page is visited.
