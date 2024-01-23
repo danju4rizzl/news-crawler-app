@@ -1,5 +1,6 @@
-import { createPlaywrightRouter, Dataset } from 'crawlee'
+import { createPlaywrightRouter, Dataset, utils } from 'crawlee'
 import { getAiDescription, getAiTitle } from './utils/helpers.js'
+import { saveToS3 } from './utils/aws.js'
 
 export const router = createPlaywrightRouter()
 
