@@ -17,7 +17,7 @@ router.addHandler('LISTING', async ({ page }) => {
   await Dataset.pushData(results)
 
   // Export the Dataset to JSON file
-  await Dataset.exportToJSON('client-data')
+  await Dataset.exportToJSON('saved-client-data')
 
   // Log the client's information
   console.log("Client's info: ", results)

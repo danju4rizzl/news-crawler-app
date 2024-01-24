@@ -5,8 +5,12 @@ import { router } from './routes/routes-clients.js'
 const START_URLS = ['https://sabusinesslistings.co.za/listings/']
 
 const clientCrawler = new PlaywrightCrawler({
-  maxRequestsPerCrawl: 50,
+  // maxRequestsPerCrawl: 50,
   requestHandler: router
 })
 
-await clientCrawler.run(START_URLS)
+const crawl = await clientCrawler.run(START_URLS)
+
+if (crawl.requestsFinished) {
+  //
+}
