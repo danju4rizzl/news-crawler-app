@@ -1,7 +1,6 @@
 import { Dataset, createPlaywrightRouter } from 'crawlee'
 
 export const router = createPlaywrightRouter()
-
 // Handler for the 'LISTING' label
 router.addHandler('LISTING', async ({ page }) => {
   // Locate the element with class 'job_description'
@@ -14,10 +13,10 @@ router.addHandler('LISTING', async ({ page }) => {
   const results = formatAllInfo(allInfo)
 
   // Push the formatted data to the Dataset
-  await Dataset.pushData(results)
+  // await Dataset.pushData(results)
 
   // Export the Dataset to JSON file
-  await Dataset.exportToJSON('saved-client-data')
+  // await Dataset.exportToJSON('saved-client-data')
 
   // Log the client's information
   console.log("Client's info: ", results)
@@ -29,26 +28,54 @@ router.addDefaultHandler(async ({ page, enqueueLinks }) => {
   const categorySelector = '.job_listings .grid__item a'
 
   // Selector for the next page element
-  const nextPageSelector = '.job-manager-pagination ul li:last-child'
+  const nextPageSelector = '.job-manager-pagination ul li a'
 
   // Wait for the category selector to appear on the page
   await page.waitForSelector(categorySelector)
 
-  // Enqueue links with the 'LISTING' label using the category selector
-  await enqueueLinks({
-    selector: categorySelector,
-    label: 'LISTING'
-  })
-
-  // Wait for the next page selector to appear on the page
-  const nextButton = await page.waitForSelector(nextPageSelector)
-
-  // If nextButton exists, enqueue links with the 'LISTING' label using the next page selector
-  if (nextButton) {
+  while (true) {
+    // Enqueue links with the 'LISTING' label using the category selector
     await enqueueLinks({
-      selector: nextPageSelector,
+      selector: categorySelector,
       label: 'LISTING'
     })
+
+    // Get the available page numbers
+    const pageNumbers = await page.$$eval(nextPageSelector, (buttons) =>
+      buttons.map((button) => parseInt(`${button.getAttribute('data-page')}`))
+    )
+
+    // Find the highest page number
+    const maxPageNumber = Math.max(...pageNumbers)
+
+    if (maxPageNumber !== pageNumbers[pageNumbers.length - 1]) {
+      // Find the next button based on the hightest page number
+
+      // TODO: Fix the next button
+      const nextButton = await page.$(
+        nextPageSelector + `[data-page="${maxPageNumber + 1}"]`
+      )
+
+      console.log('PageNumber ', pageNumbers)
+      console.log('maxPageNumber ', maxPageNumber)
+      console.log('next button ', nextButton)
+
+      // If nextButton exists, enqueue links with the 'LISTING' label using the next page selector
+      if (nextButton) {
+        await nextButton.click()
+        await page.waitForSelector(categorySelector)
+
+        // TODO: must fix next button not working: returning null
+        // await enqueueLinks({
+        //   selector: categorySelector,
+        //   label: 'LISTING'
+        // })
+        await page.screenshot({ path: 'screenshot.png' })
+        console.log('gotten ', nextButton)
+      } else {
+        break
+      }
+    }
   }
 })
 
