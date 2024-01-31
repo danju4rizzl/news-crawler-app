@@ -5,7 +5,7 @@ import { router } from './routes/yellowpages-south-africa.js'
 const START_URLS = ['https://www.yellowpages-south-africa.com']
 
 const clientCrawler = new PlaywrightCrawler({
-  // maxRequestsPerCrawl: 50,
+  maxRequestsPerCrawl: 5,
   requestHandler: router
 })
 
