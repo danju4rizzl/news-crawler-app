@@ -1,23 +1,12 @@
-import { CheerioCrawler } from 'crawlee'
+import { Dataset, PlaywrightCrawler, log } from 'crawlee'
+import { router } from './routes/yellowpages-south-africa.js'
 
-const crawler = new CheerioCrawler({
-  maxRequestsPerCrawl: 5,
+// Define the URL to start the crawl from
+const START_URLS = ['https://www.yellowpages-south-africa.com']
 
-  // handles the processing request
-  async requestHandler({ $, request, enqueueLinks }) {
-    const title = $('title').text()
-    // The default behavior of enqueueLinks is to stay on the same hostname,
-    // so it does not require any parameters.
-    // This will ensure the subdomain stays the same.
-    await enqueueLinks({
-      transformRequestFunction(request) {
-        // ignore all adverts links
-        if (request.url.endsWith('/advertise-with-us')) return false
-        return request
-      }
-    })
-    console.log(`The title of "${request.url}" is: ${title}.`)
-  }
+const clientCrawler = new PlaywrightCrawler({
+  // maxRequestsPerCrawl: 5,
+  requestHandler: router
 })
 
-await crawler.run(['https://punchng.com/'])
+await clientCrawler.run(START_URLS)

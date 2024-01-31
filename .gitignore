@@ -6,3 +6,10 @@ node_modules
 apify_storage
 crawlee_storage
 storage
+
+# Added by Apify CLI
+.venv
+
+# Manually added
+.env
+*.zip
