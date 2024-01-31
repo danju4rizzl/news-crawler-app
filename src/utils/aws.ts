@@ -95,9 +95,9 @@ export const backupToS3 = async (scrapedFileName: string) => {
       console.log(`Created ${Location} bucket`)
     }
 
-    console.log('🟣 Creating S3 backup...')
+    console.log('🟣 Creating S3 backup... \n')
     await s3.send(uploadFile)
-    console.log('🟢 Successfully saved in S3 🪣')
+    console.log('🟢 Successfully created backup in S3 🪣')
 
     // return res
   } catch (err) {

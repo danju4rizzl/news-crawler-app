@@ -49,7 +49,7 @@ const s3 = new S3Client({
 
 The application also saves the scraped data to an [Amazon Dynamodb](https://docs.aws.amazon.com/dynamodb/index.html) table. You can add or modify the `aws.ts` file to make changes to the database.
 
-### Working with Google GenerativeAI
+### Working with AI - GenerativeAI
 
 The configuration is found in the `src/lib/ai.ts`, which exports `aiModel` globally trough the application. However you'll need a GenerativeAI API key from [Google's Maker Suite](https://makersuite.google.com/app).
 

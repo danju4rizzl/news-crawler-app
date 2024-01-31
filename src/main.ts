@@ -14,6 +14,6 @@ await clientCrawler.run(START_URLS)
 
 // Runs when the crawler is finished.
 if (!clientCrawler.running) {
-  console.log('🟢👍🟢 Crawler is finished')
+  console.log('\n 🟢👍🟢 Crawler is finished \n')
   await backupToS3('yellowpages-south-africa.json')
 }
