@@ -12,8 +12,16 @@ import {
   BatchWriteCommand
 } from '@aws-sdk/lib-dynamodb'
 
-const s3 = new S3Client({ region: 'us-east-2' })
+import { fileURLToPath } from 'url'
+import { dirname, resolve } from 'path'
+
+import fs from 'fs'
+
+const s3 = new S3Client({ region: 'us-west-2' })
 const db = new DynamoDBClient({ region: 'us-west-2' })
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 export interface DataItem {
   id: string
@@ -48,12 +56,33 @@ export const saveDataToDynamoDB = async (data: DataItem) => {
 }
 
 // Used to save the exported json file to s3
-export const saveToS3 = async () => {
-  const bucketName = `crawler-bot-v1`
+/**
+ *
+ * @param scrapedFileName Name of the file to upload into S3. This is the file that the scraper has saved locally in the default `storage dir`. 🟡 Remember to include the file extension .json | .png | jpg | pdf...etc
+ * @example saveToS3('competitor-data-file.json')
+ *
+ */
+export const backupToS3 = async (scrapedFileName: string) => {
+  const bucketName = `crawler-bot-v2`
+  const objectName = scrapedFileName
+  const filePath = resolve(
+    __dirname,
+    '../../storage/key_value_stores/default/',
+    objectName
+  )
+  // console.log('filepath: ', filePath) // you can debug the filepath
+
+  const fileStream = fs.createReadStream(filePath)
   const buckets = new ListBucketsCommand({})
 
   const createBucket = new CreateBucketCommand({
     Bucket: bucketName
+  })
+
+  const uploadFile = new PutObjectCommand({
+    Bucket: bucketName,
+    Key: objectName,
+    Body: fileStream
   })
 
   try {
@@ -65,7 +94,10 @@ export const saveToS3 = async () => {
       const { Location } = await s3.send(createBucket)
       console.log(`Created ${Location} bucket`)
     }
-    console.log('Buckets:  ', allBuckets)
+
+    console.log('🟣 Creating S3 backup...')
+    await s3.send(uploadFile)
+    console.log('🟢 Successfully saved in S3 🪣')
 
     // return res
   } catch (err) {

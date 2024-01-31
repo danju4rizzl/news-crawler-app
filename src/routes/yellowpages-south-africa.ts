@@ -33,7 +33,7 @@ router.addDefaultHandler(async ({ page, enqueueLinks, log }) => {
     }
 
     results.push(result)
-    await saveDataToDynamoDB(result) // this will save the data to dynamoDB
+    //! await saveDataToDynamoDB(result) // this will save the data to dynamoDB
   }
 
   // Check the next buttons for pagination
