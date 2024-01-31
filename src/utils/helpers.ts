@@ -1,9 +1,9 @@
 import aiModel from './ai.js'
 
 /**
- * 
+ *
  * @param rawDesc The description of the product to allow the AI model improve the scraped description
- * @returns Provides the response from the AI model about the product description.  
+ * @returns Provides the response from the AI model about the product description.
  */
 export async function getAiDescription(rawDesc: string) {
   const aiDesc = await aiModel.generateContent(
@@ -13,10 +13,10 @@ export async function getAiDescription(rawDesc: string) {
   return description
 }
 /**
- * 
+ *
  * @param rawTitle The title of the product used to prompt the AI model
- * @param rawDesc The description of the product used to give the AI model more context about the prompt 
- * @returns Gives you the formatted title of the product from the AI model 
+ * @param rawDesc The description of the product used to give the AI model more context about the prompt
+ * @returns Gives you the formatted title of the product from the AI model
  */
 export async function getAiTitle(rawTitle: string | null, rawDesc: string) {
   const aiTitle = await aiModel.generateContent(

@@ -1,8 +1,8 @@
 import { PlaywrightCrawler, log } from 'crawlee'
-import { router } from './routes/routes-clients.js'
+import { router } from './routes/yellowpages-south-africa.js'
 
 // Define the URL to start the crawl from
-const START_URLS = ['https://sabusinesslistings.co.za/listings/']
+const START_URLS = ['https://www.yellowpages-south-africa.com']
 
 const clientCrawler = new PlaywrightCrawler({
   // maxRequestsPerCrawl: 50,
