@@ -1,5 +1,5 @@
 import { Dataset, createPlaywrightRouter } from 'crawlee'
-import { saveToDB } from '../utils/aws.js'
+import { saveSingleToDynamo } from '../utils/aws.js'
 import { v4 as uuidv4 } from 'uuid'
 
 export const router = createPlaywrightRouter()
@@ -32,22 +32,21 @@ router.addDefaultHandler(async ({ page, enqueueLinks, log }) => {
       phone
     }
 
-    const savedData = await saveToDB(result)
-    console.log('saved:', savedData)
+    // await saveToDB(result) // this
     results.push(result)
   }
 
   // Check the next buttons for pagination
-  const nextButton = await page.$('ul.pagination li:last-child a ')
-  if (nextButton) {
-    await enqueueLinks({
-      selector: 'ul.pagination li:last-child a',
-      label: 'BUSINESSES'
-    })
-  }
+  // const nextButton = await page.$('ul.pagination li:last-child a ')
+  // if (nextButton) {
+  //   await enqueueLinks({
+  //     selector: 'ul.pagination li:last-child a',
+  //     label: 'BUSINESSES'
+  //   })
+  // }
 
   // Save the data that scraped
   console.log(results)
-  // await Dataset.pushData(results)
+  await Dataset.pushData(results)
   // await Dataset.exportToJSON('yellowpages-south-africa')
 })
